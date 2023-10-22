@@ -6,6 +6,8 @@ endif ()
 
 include(ExternalProject)
 
+#https://cmake.org/cmake/help/latest/module/ExternalProject.html#git
+
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if (NOT isMultiConfig)
   if (NOT CMAKE_BUILD_TYPE)
@@ -35,7 +37,7 @@ endif ()
 if (NOT EMSCRIPTEN)
   ExternalProject_Add(
     SDL2
-    URL https://github.com/libsdl-org/SDL/releases/download/release-2.26.5/SDL2-2.26.5.tar.gz
+    URL https://github.com/libsdl-org/SDL/releases/download/release-2.26.5/SDL2-2.26.5.tar.gz 
     URL_HASH MD5=47f22c109070431ecccd90abd3c0ab6e
     PREFIX ${PREFIX_DIR}
     BINARY_DIR ${PREFIX_DIR}/src/SDL2-build/${build_type_dir}
@@ -48,8 +50,8 @@ endif ()
 
 ExternalProject_Add(
   bgfx
-  GIT_REPOSITORY https://github.com/pr0g/bgfx.cmake.git
-  GIT_TAG b208d0c37b84fd6e92096a6c7fcdfc4856af198e
+  GIT_REPOSITORY https://github.com/bkaradzic/bgfx.cmake
+  GIT_TAG 875927a712fa03976015db9770a71b49f0e10793
   PREFIX ${PREFIX_DIR}
   BINARY_DIR ${PREFIX_DIR}/src/bgfx-build/${build_type_dir}
   CMAKE_COMMAND ${THIRD_PARTY_CMAKE_COMMAND}
@@ -72,6 +74,22 @@ ExternalProject_Add(
   CMAKE_ARGS ${build_type_arg} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
              "$<$<CONFIG:Debug>:-DCMAKE_DEBUG_POSTFIX=d>"
              -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS=ON
+  BUILD_COMMAND cmake --build <BINARY_DIR> ${build_config_arg}
+  INSTALL_COMMAND cmake --build <BINARY_DIR> --target install
+                  ${build_config_arg})
+
+
+ExternalProject_Add(
+  Optick
+  GIT_REPOSITORY https://github.com/bombomby/optick.git
+  GIT_TAG 8abd28dee1a4034c973a3d32cd1777118e72df7e
+  PREFIX ${PREFIX_DIR}
+  BINARY_DIR ${PREFIX_DIR}/src/profiler-optick-build/${build_type_dir}
+  CMAKE_COMMAND ${THIRD_PARTY_CMAKE_COMMAND}
+  CMAKE_ARGS ${build_type_arg} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+             "$<$<CONFIG:Debug>:-DCMAKE_DEBUG_POSTFIX=d>"
+             -DOPTICK_USE_D3D12=ON #TODO:parameterize
+             -DOPTICK_BUILD_GUI_APP=OFF
   BUILD_COMMAND cmake --build <BINARY_DIR> ${build_config_arg}
   INSTALL_COMMAND cmake --build <BINARY_DIR> --target install
                   ${build_config_arg})

@@ -10,6 +10,8 @@
 #include "imgui.h"
 #include "sdl-imgui/imgui_impl_sdl2.h"
 
+#include "optick.h"
+
 #if BX_PLATFORM_EMSCRIPTEN
 #include "emscripten.h"
 #endif // BX_PLATFORM_EMSCRIPTEN
@@ -141,8 +143,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    const int width = 800;
-    const int height = 600;
+    const int width = 1024;
+    const int height = 768;
     SDL_Window* window = SDL_CreateWindow(
         argv[0], SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width,
         height, SDL_WINDOW_SHOWN);
@@ -251,6 +253,7 @@ int main(int argc, char** argv)
     emscripten_set_main_loop_arg(main_loop, &context, -1, 1);
 #else
     while (!context.quit) {
+        OPTICK_FRAME("MainThread");
         main_loop(&context);
     }
 #endif // BX_PLATFORM_EMSCRIPTEN

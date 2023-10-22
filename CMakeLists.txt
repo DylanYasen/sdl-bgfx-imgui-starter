@@ -18,6 +18,7 @@ endif ()
 find_package(SDL2 REQUIRED CONFIG CMAKE_FIND_ROOT_PATH_BOTH)
 find_package(bgfx REQUIRED CONFIG CMAKE_FIND_ROOT_PATH_BOTH)
 find_package(imgui.cmake REQUIRED CONFIG CMAKE_FIND_ROOT_PATH_BOTH)
+find_package(Optick REQUIRED CONFIG CMAKE_FIND_ROOT_PATH_BOTH)
 
 add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE main.cpp sdl-imgui/imgui_impl_sdl2.cpp
@@ -25,7 +26,7 @@ target_sources(${PROJECT_NAME} PRIVATE main.cpp sdl-imgui/imgui_impl_sdl2.cpp
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_11)
 target_link_libraries(
   ${PROJECT_NAME} PRIVATE SDL2::SDL2-static SDL2::SDL2main bgfx::bgfx bgfx::bx
-                          imgui.cmake::imgui.cmake)
+                          imgui.cmake::imgui.cmake Optick::OptickCore)
 target_link_options(
   ${PROJECT_NAME} PRIVATE $<$<BOOL:${EMSCRIPTEN}>:-sMAX_WEBGL_VERSION=2
   -sALLOW_MEMORY_GROWTH=1 --preload-file=shader/embuild/v_simple.bin
@@ -62,6 +63,14 @@ if (WIN32)
     TARGET ${PROJECT_NAME}
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:SDL2::SDL2>
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    VERBATIM)
+
+  # copy the OptickCore.dll to the same folder as the executable
+    add_custom_command(
+    TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Optick::OptickCore>
             $<TARGET_FILE_DIR:${PROJECT_NAME}>
     VERBATIM)
 endif ()
